@@ -1,32 +1,26 @@
 /**
  * Created by viktoria on 11.07.16.
  */
-var name = "FIN REPORTING & ACCOUNTING";
-var statusD = "AMBER";
-var statusF = "GREEN";
-var processWidget = function () {
+
+var processWidget = function (width, height, group) {
     var outCircleColor = "#2a457c";
     var innerCircleColor = "#1F3C76";
     var lightStrokeColor = "#36507D";
     var darkStrokeColor = "#1C2E56";
-    var view;
+    var view = group;
     var arc;
     var startAngle = Math.PI / 4;
     var arcLength = Math.PI / 2;
-    var INNER_RADIUS = 45;
-    var OUTER_RADIUS = 70;
-    var nameHeight = 40;
-    var height = 200 + nameHeight;
-    var width = 200;
-
-    function init() {
-        view = d3.selectAll("body").append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
-            .classed("processWigdet", true)
-            .attr("transform", "translate(" + width / 2 + "," + (height - nameHeight) / 2 + ")");
-
+    var nameHeight = 0.2 * height;
+    var OUTER_RADIUS = (height ) / 2 - nameHeight;
+    var nameWidth = width;
+    var INNER_RADIUS = 0.64 * OUTER_RADIUS;
+    var fontSize =   (nameHeight / 2);
+    var processWidgetData = {
+        "processID": "MP-16",
+        "name": "Fin Reporting & Accounting",
+        "definitionStatus": "AMBER",
+        "efficiencyStatus": "RED"
     }
 
     function drawCircle(radius, color) {
@@ -65,11 +59,12 @@ var processWidget = function () {
             .attr("fill-opacity", 0.9);
     }
 
-    function statText(astatusArc, text) {
+    function statText(statusArc, text) {
         view.append("text")
             .classed("statusText", true)
-            .attr("transform", "translate(" + arc.centroid(astatusArc) + ")")
-            .text(text);
+            .attr("transform", "translate(" + arc.centroid(statusArc) + ")")
+            .text(text)
+            .attr("font-size", fontSize + "px");
     }
 
     function drawStatusArcs() {
@@ -77,29 +72,53 @@ var processWidget = function () {
             .innerRadius(INNER_RADIUS)
             .outerRadius(OUTER_RADIUS)
             .startAngle(startAngle);
-        var effStatus = drawStatusArc(startAngle, statusF);
+        var effStatus = drawStatusArc(startAngle, processWidgetData.efficiencyStatus);
         statText(effStatus, "F");
         startAngle = startAngle + 2 * arcLength;
-        var defStatus = drawStatusArc(startAngle, statusD);
+        var defStatus = drawStatusArc(startAngle, processWidgetData.definitionStatus);
         statText(defStatus, "D");
     }
 
-    function nameText(name) {
+    function nameText() {
         view.append("text")
             .classed("textName", true)
-            .attr("transform", "translate(0," + ((height - nameHeight) / 2 ) + ")")
-            .attr("width", width)
-            .attr("height", nameHeight)
-            .text(name);
+            .attr("transform", "translate(0," + (OUTER_RADIUS+nameHeight/2) + ")")
+            .text(processWidgetData.name)
+            .call(wrap, nameWidth)
+            .attr("font-size", fontSize + "px");
     }
 
+    function wrap(text, width) {
+        text.each(function () {
+            var text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1,
+                y = text.attr("y"),
+                dy = text.attr("dy") ? text.attr("dy") : 0,
+                tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                }
+            }
+        });
+    }
+
+
     function renderWidget() {
-        init();
         drawCircles();
         drawStatusArcs();
-        nameText(name);
+        nameText();
     }
 
     renderWidget();
 
-}();
+}(500, 500, d3.select(".center"));
