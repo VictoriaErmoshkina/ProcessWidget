@@ -1,41 +1,42 @@
 /**
  * Created by viktoria on 11.07.16.
  */
-var width = 200;
-var height = 200;
+var width = 500;
+var height = 500;
 
 var processWidget = function (width, height, group, data) {
-    var outCircleColor = "#2a457c";
-    var innerCircleColor = "#1f3871";
+    var outCircleColor = "#5a8ec9";
+    var innerCircleColor = "#1e376d";
     var darkStrokeColor = "#1C2E56";
     var view = group;
     var arc;
     var startAngle = 5 * Math.PI / 16;
     var arcLength = 3 * Math.PI / 8;
-    var nameHeight = 0.2 * height;
-    var OUTER_RADIUS = height / 2 - nameHeight;
-    var nameWidth = width;
-    var INNER_RADIUS = 0.6 * OUTER_RADIUS;
-    var fontSize = 0.8 * (nameHeight / 2);
-    var iconCoef = 0.3;
-    var iconlink = "icon-cat.jpg";
     var processWidgetData = data;
     var config = {
-           //TODO place all properties into config
+        nameHeight: calculateSize(0.2),
+        outerradius: calculateSize(0.3),
+        nameWidth: width*0.8,
+        innerradius: calculateSize(0.18),
+        fontSize: calculateSize(0.08),
+        iconSize: calculateSize(0.3),
+        animationStep: 800,
+        iconlink: 'https://lh3.googleusercontent.com/-awJv5cT7ZrA/AAAAAAAAAAI/AAAAAAAAAAA/t2yC-_5oFM0/photo.jpg'
     };
+
     function highlightingGradient() {
         var radialGradient;
         radialGradient = view.append("defs")
             .append("radialGradient")
             .attr("id", "radial-gradient");
         radialGradient.append("stop")
-            .attr("offset", "63%")
-            .attr("stop-color", "#345c99") //345c99
+            .attr("offset", "48%")
+            .attr("stop-color", "#5fadff")
             .attr("stop-opacity", 1);
         radialGradient.append("stop")
-            .attr("offset", "90%")
-            .attr("stop-color", "#2c4b84") //2c4b84
-            .attr("stop-opacity", 0.6);
+            .attr("offset", "75%")
+            .attr("stop-color", "#5a8ec9")
+            .attr("stop-opacity", 0);
         return "url(#radial-gradient)";
     }
 
@@ -45,67 +46,76 @@ var processWidget = function (width, height, group, data) {
             .append("radialGradient")
             .attr("id", "shadow-gradient");
         radialGradient.append("stop")
-            .attr("offset", "60%")
-            .attr("stop-color", "black") //345c99
-            .attr("stop-opacity", 1);
+            .attr("offset", "30%")
+            .attr("stop-color", "1e376d")
+            .attr("stop-opacity", 0.5);
         radialGradient.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", "#2c4b84") //2c4b84
-            .attr("stop-opacity", 0);
+            .attr("stop-color", "#0f2452")
+            .attr("stop-opacity", 0.8);
         return "url(#shadow-gradient)";
     }
 
-    function drawCircle(radius, color) {
-        view.append("circle")
-            .attr("r", radius)
-            .attr("fill", color)
-            .attr("fill-opacity", 0.9);
-    }
 
-    function drawOuterCircle(){
+    function drawOuterCircle() {
         var darkStrokeWidth = 4;
         var lightStrokeWidth = 2;
 
-        var outerCircle = view.append("circle");// = drawCircle(OUTER_RADIUS, outCircleColor);
+        var outerCircle = view.append("circle");
         outerCircle
-            .attr("r", 0)
-            .transition().duration(1000)
-            .attr("r", INNER_RADIUS - darkStrokeWidth - lightStrokeWidth)
+            .attr("r", config.outerradius)
+            .attr("fill-opacity", 0)
             .attr("fill", outCircleColor)
-            .attr("fill-opacity", 0.9);
-        //var lightGradient = view.append("circle"); // = drawCircle(OUTER_RADIUS, highlightingGradient());
-
+            //.transition().duration(config.animationStep)
+            //.attr("fill-opacity", 0)
+            //.attr("r", config.innerradius - darkStrokeWidth - lightStrokeWidth)
+            .transition().delay(config.animationStep).duration(config.animationStep)
+            //.attr("r", config.outerradius)
+            .attr("fill", outCircleColor)
+            .attr("fill-opacity", 0.2);
+        var lightGradient = view.append("circle");
+        lightGradient
+            .attr("r", config.outerradius)
+            .attr("fill-opacity", 0)
+            .attr("fill", highlightingGradient())
+            //.transition().duration(config.animationStep)
+            //.attr("fill-opacity", 0)
+            //.attr("r", config.innerradius - darkStrokeWidth - lightStrokeWidth)
+            .transition().delay(config.animationStep).duration(config.animationStep)
+            //.attr("r", config.outerradius)
+            .attr("fill", highlightingGradient())
+            .attr("fill-opacity", 0.4)
     }
-    function drawInnerCircle(){
+
+    function drawInnerCircle() {
         var darkStrokeWidth = 4;
         var lightStrokeWidth = 2;
-        //var shadow = drawCircle(INNER_RADIUS + darkStrokeWidth + lightStrokeWidth, shadowGradient());
-        //var stroke = drawCircle(INNER_RADIUS - darkStrokeWidth, darkStrokeColor);
-        //var innerCircle = drawCircle(INNER_RADIUS - darkStrokeWidth - lightStrokeWidth, innerCircleColor);
-        var shadow =  view.append("circle");
-        shadow
-            .attr("r", 0)
-            .transition().duration(1000)
-            .attr("r", INNER_RADIUS + darkStrokeWidth + lightStrokeWidth)
-            .attr("fill", shadowGradient())
-            .attr("fill-opacity", 0.9);
         var innerCircle = view.append("circle");
         innerCircle
             .attr("r", 0)
-            .transition().duration(1000)
-            .attr("r", INNER_RADIUS - darkStrokeWidth - lightStrokeWidth)
+            .transition().duration(config.animationStep)
+            .attr("r", config.innerradius - lightStrokeWidth)
             .attr("fill", innerCircleColor)
             .attr("fill-opacity", 0.9);
+        var shadow = view.append("circle");
+        shadow
+            .attr("r", 0)
+            .transition().duration(config.animationStep)
+            .attr("r", config.innerradius )
+            .attr("fill", shadowGradient())
+            .attr("fill-opacity", 0.4);
 
     }
 
     function drawIcon() {
-        var size = 50;
         view.append("image")
-            .attr("xlink:href", iconlink)
-            .attr("transform", "translate(" + (-size*0.5) + ", " + (-size*0.5) + ")")
-            .attr("width", size)
-            .attr("height", size);
+            .attr("xlink:href", config.iconlink)
+            .attr("transform", "translate(" + (-config.iconSize * 0.5) + ", " + (-config.iconSize * 0.5) + ")")
+            .attr("width", config.iconSize)
+            .attr("height", config.iconSize)
+            .attr("opacity", 0)
+            .transition().delay(4*config.animationStep).duration(config.animationStep)
+            .attr("opacity", 0.9);
     }
 
     function drawCircles() {
@@ -114,14 +124,25 @@ var processWidget = function (width, height, group, data) {
 
     }
 
+    function statusTextColor(status) {
+        switch (status) {
+            case 'RED':
+                return "#e997b8";
+            case 'AMBER':
+                return "#e9ae97";
+            case 'GREEN':
+                return "#89e3b3";
+        }
+    }
+
     function statusColor(status) {
         switch (status) {
             case 'RED':
-                return "#a8184d";
+                return "#a31a51";
             case 'AMBER':
-                return "#cd5f22";
+                return "#c65919";
             case 'GREEN':
-                return "#1b8958";
+                return "#178e48";
         }
     }
 
@@ -129,38 +150,48 @@ var processWidget = function (width, height, group, data) {
         arc.startAngle(startAngle);
         view.append("path")
             .style("fill", statusColor(status))
-            .attr("d", arc.endAngle(startAngle + arcLength).outerRadius(INNER_RADIUS))
-            .attr("fill-opacity", 0.9).transition().duration(1000).attr("d", arc.endAngle(startAngle + arcLength).outerRadius(OUTER_RADIUS));
+            .attr("d", arc.endAngle(startAngle + arcLength).outerRadius(config.innerradius))
+            .attr("fill-opacity", 0.9)
+            .transition().delay(2*config.animationStep).duration(config.animationStep)
+            .attr("d", arc.endAngle(startAngle + arcLength).outerRadius(config.outerradius));
     }
 
-    function statText(statusArc, text) {
+    function statText(statusArc, text, status) {
         view.append("text")
             .classed("statusText", true)
             .attr("transform", "translate(" + arc.centroid(statusArc) + ")")
             .text(text)
+            .attr("fill", statusTextColor(status))
             .attr("alignment-baseline", "middle")
-            .attr("font-size", fontSize + "px");
+            .attr("font-size", config.fontSize + "px")
+            .attr("opacity", 0)
+            .transition().delay(3*config.animationStep).duration(config.animationStep)
+            .attr("opacity", 0.9);
     }
 
     function drawStatusArcs() {
         arc = d3.svg.arc()
-            .innerRadius(INNER_RADIUS)
-            .outerRadius(OUTER_RADIUS)
+            .innerRadius(config.innerradius)
+            .outerRadius(config.outerradius)
             .startAngle(startAngle);
         var effStatus = drawStatusArc(startAngle, processWidgetData.efficiencyStatus);
-        statText(effStatus, "E");
+        statText(effStatus, "E", processWidgetData.efficiencyStatus);
         startAngle = startAngle + Math.PI;
         var defStatus = drawStatusArc(startAngle, processWidgetData.definitionStatus);
-        statText(defStatus, "D");
+        statText(defStatus, "D", processWidgetData.definitionStatus);
     }
 
     function nameText() {
+        var textname = processWidgetData.name.toUpperCase();
         view.append("text")
             .classed("textName", true)
-            .attr("transform", "translate(0," + (OUTER_RADIUS + nameHeight / 2) + ")")
-            .text(processWidgetData.name)
-            .attr("font-size", fontSize + "px")
-            .call(wrap, nameWidth);
+            .attr("transform", "translate(0," + (config.outerradius + config.nameHeight / 2) + ")")
+            .text(textname)
+            .attr("font-size", config.fontSize + "px")
+            .call(wrap, config.nameWidth)
+            .attr("opacity", 0)
+            .transition().delay(4*config.animationStep).duration(config.animationStep)
+            .attr("opacity", 0.9);
     }
 
     function wrap(text, width) {
@@ -187,9 +218,10 @@ var processWidget = function (width, height, group, data) {
         });
     }
 
-    function calculateSize(multiplier){
-        return height*multiplier;
+    function calculateSize(multiplier) {
+        return Math.min(height, width) * multiplier;
     }
+
     function renderWidget() {
         drawCircles();
         drawStatusArcs();
@@ -203,6 +235,6 @@ var processWidget = function (width, height, group, data) {
     {
         "processID": "MP-16",
         "name": "Fin Reporting & Accounting",
-        "definitionStatus": "RED",
-        "efficiencyStatus": "GREEN"
+        "definitionStatus": "AMBER",
+        "efficiencyStatus": "RED"
     });

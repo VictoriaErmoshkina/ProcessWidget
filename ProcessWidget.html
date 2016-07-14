@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Process Widget</title>
+    <link href="http://allfont.ru/allfont.css?fonts=open-sans-light" rel="stylesheet" type="text/css" />
     <style>
         .processWidget {
             background-color: transparent;
         }
 
         .textName {
-            font-family: "Bitstream Vera Sans";
-            fill: white;
+            font-family: "Open Sans Light";
+            font-weight: bold;
+            fill: #8dadd4;
             text-anchor: middle;
             fill-opacity: 0.9;
         }
 
         .statusText {
-            font-family: "Bitstream Vera Sans";
+            font-family: "Open Sans Light";
+            font-weight: bold;
             fill: white;
             text-anchor: middle;
             fill-opacity: 0.9;
@@ -25,14 +28,14 @@
         body {
             width: 100vw;
             height: 100vh;
-            background: linear-gradient(to bottom right, #1f3658, #155d92);
+            background: linear-gradient(to bottom right, #1c2f5b, #225895);
             fill-opacity: 0.9;
         }
     </style>
 </head>
 <body>
-<svg width="200" height="200">
-    <g class="center" transform="translate(100,100)"></g>
+<svg width="500" height="500">
+    <g class="center" transform="translate(250,250)"></g>
 </svg>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
 <script src="ProcessWidget.js"></script>
